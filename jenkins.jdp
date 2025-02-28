@@ -1,0 +1,26 @@
+pipeline {
+    agent any
+    stages{
+        stage('pull'){
+            steps{
+                 git branch: 'main', url: 'https://github.com/Shani877/nem-backend-3t.git'
+            } 
+        }
+        stage('build'){
+            steps{
+                 sh 'mvn clean package'
+            }
+        }
+       stage('deploy'){
+            steps{
+                 sh '''
+                 docker build -t yogesh919/backend:latest .
+                 docker push yogesh919/backend:latest
+                 docker rmi yogesh919/backend:latest
+                 kubectl apply -f backdeploy.yaml
+                 kubectl apply -f service.yml
+                 '''
+            }
+        }
+   }
+}
